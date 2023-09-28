@@ -2,14 +2,15 @@ import java.sql.*;
 import java.util.*;
 
 public class OSS{
-    public static int count;
+    public static int count_sales;
+    public static int count_users;
     public static void main(String args[]){
         try{
             Class.forName("com.mysql.jdbc.Driver");
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/OSS","root","");
 
             System.out.println("Choose :" );
-            System.out.println("1. PURCHASE ITEM\n2. SALES HISTORY");
+            System.out.println("1. PURCHASE ITEM\n2. SALES HISTORY\n3. SIGN UP");
 
             Scanner sc = new Scanner(System.in);
             int inputval = sc.nextInt();
@@ -47,7 +48,7 @@ public class OSS{
 
                             ResultSet c = post.executeQuery("SELECT COUNT(*) FROM sales;");
                             while (c.next()){
-                                count = c.getInt(1);
+                                count_sales = c.getInt(1);
                             }
 
                             ResultSet bill = post.executeQuery("SELECT name,price FROM item where sr=" + choice + ";");
@@ -61,7 +62,7 @@ public class OSS{
                                 System.out.println("Quantity : " + quantity);
                                 System.out.println("Grand Total : " + total);
 
-                                int temp = invoice.executeUpdate("INSERT INTO sales(`sr`, `id`, `item`, `quantity`, `total`) " + "VALUES("+ (count + 1) + ",'" + id +"','" + item + "',"+ quantity + ","+ total+");");
+                                int temp = invoice.executeUpdate("INSERT INTO sales(`sr`, `id`, `item`, `quantity`, `total`) " + "VALUES("+ (count_sales + 1) + ",'" + id +"','" + item + "',"+ quantity + ","+ total+");");
                             }
 
                         }
@@ -77,6 +78,21 @@ public class OSS{
                         System.out.println(sales.getInt(1)+"\t"+ sales.getString(2)+"\t"+ sales.getString(3) + "\t"+ sales.getInt(4) + "\t"+ sales.getInt(5));
                     }
                     break;
+                case 3:
+                    String user_id,passkey;
+                    System.out.println("Enter New Account Details :");
+                    System.out.print("User ID : ");
+                    user_id = sc.next();
+                    System.out.print("Password : ");
+                    passkey = sc.next();
+
+                    ResultSet c = stmt.executeQuery("SELECT COUNT(*) FROM cust_cred;");
+                    while (c.next()){
+                        count_users = c.getInt(1);
+                    }
+                    int temp = stmt.executeUpdate("INSERT INTO cust_cred(`sr`, `id`, `pass`) " + "VALUES("+ (count_users + 1) + ",'" + user_id +"','" + passkey + "');");
+                    System.out.println("Account Created Successfully!\nNavigate to Purchase");
+                    break;
             }
             con.close();
 
@@ -85,5 +101,4 @@ public class OSS{
             e.printStackTrace();
         }
     }
-
 }
